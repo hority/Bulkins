@@ -4,4 +4,7 @@
 /Bulkins/obj/**
 /Bulkins/bin/**
 *.suo
-
+/Bulkins/packages/**
+/Bulkins.Tests/obj/**
+/Bulkins.Tests/bin/**
+/Bulkins.Tests/ConnectionString.txt
