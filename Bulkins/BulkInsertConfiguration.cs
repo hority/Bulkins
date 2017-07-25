@@ -22,19 +22,30 @@ namespace Bulkins
         /// Set SqlBulkCopyOptions
         /// </summary>
         /// <param name="options"></param>
-        /// <returns>This method OVERWRITES SqlBulkCopyOptions</returns>
+        /// <returns>Instance of BulkInsertConfiguration</returns>
+        /// <remarks>This method OVERWRITES SqlBulkCopyOptions</remarks>
         public BulkInsertConfiguration Options(SqlBulkCopyOptions options)
         {
             this.SqlBulkCopyOptions = options;
             return this;
         }
 
+        /// <summary>
+        /// Specifies destination table for SqlBulkCopy 
+        /// </summary>
+        /// <param name="destinationTableName"></param>
+        /// <returns>Instance of BulkInsertConfiguration</returns>
         public BulkInsertConfiguration To(string destinationTableName)
         {
             this.DestinationTableName = destinationTableName;
             return this;
         }
 
+        /// <summary>
+        /// Specifies source file for SqlBulkCopy 
+        /// </summary>
+        /// <param name="sourceFileInfo"></param>
+        /// <returns>Instance of BulkInsertConfiguration</returns>
         public BulkInsertConfiguration From(SourceFileInfo sourceFileInfo)
         {
             this.SourceFileInfo = sourceFileInfo;
