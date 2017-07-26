@@ -9,3 +9,4 @@
 /Bulkins.Tests/bin/**
 /Bulkins.Tests/ConnectionString.txt
 /.vs
+/Bulkins/Bulkins.csproj.user
