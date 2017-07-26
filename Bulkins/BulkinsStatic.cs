@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualBasic.FileIO;
 using System.Data;
+using System.IO;
 
 namespace Bulkins
 {
@@ -22,19 +23,85 @@ namespace Bulkins
         /// <param name="conf"></param>
         /// <param name="options"></param>
         /// <param name="transaction"></param>
-        public static void BulkInsert(this SqlConnection connection, Func<BulkInsertConfiguration, BulkInsertConfiguration> conf, SqlTransaction transaction = null)
+        public static void ExecuteBulkInsert(this SqlConnection connection, BulkInsertOperation config, SqlTransaction transaction = null)
         {
-            var configuration = new BulkInsertConfiguration();
-            if (conf != null)
+            using (var bcp = new SqlBulkCopy(connection, config.SqlBulkCopyOptions, transaction) { DestinationTableName = config.DestinationTableName })
             {
-                configuration = conf(configuration);
-            }
-
-            using (var bcp = new SqlBulkCopy(connection, configuration.SqlBulkCopyOptions, transaction) { DestinationTableName = configuration.DestinationTableName })
-            {
-                var dt = ReadCSV(configuration.SourceFileInfo.Path, configuration.SourceFileInfo.HasHeader);
+                var dt = ReadCSV(config.SourceFileInfo);
                 bcp.WriteToServer(dt);
             }
+        }
+
+        /// <summary>
+        /// Outputs results of SELECT statement into specified file with default options
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="filePath"></param>
+        public static void ExportTo(this SqlCommand command,string filePath)
+        {
+            ExportTo(command, new FileInfo(filePath));
+        }
+
+        /// <summary>
+        /// Outputs results of SELECT statement into specified file
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="fileInfo"></param>
+        public static void ExportTo(this SqlCommand command, FileInfo fileInfo)
+        {
+            using (var dr = command.ExecuteReader())
+            using (var sw = new StreamWriter(fileInfo.Path, false, Encoding.UTF8))
+            {
+                var c = dr.FieldCount;
+                var sb = new StringBuilder();
+                
+                if (fileInfo.HasHeader)
+                {
+                    var header = new string[c];
+                    for (var i = 0; i < c; i++)
+                    {
+                        sb.Append(Value(dr.GetName(i))).Append(fileInfo.Delimiter);
+                    }
+                    if(sb.Length > 0)
+                    {
+                        sb.Remove(sb.Length - 1, 1);
+                    }
+                    sw.Write(sb.AppendLine().ToString());
+                }
+
+                while (dr.Read())
+                {
+                    sb.Clear();
+                    for(var i = 0; i < c; i++)
+                    {
+                        sb.Append(Value(dr.GetValue(i))).Append(fileInfo.Delimiter);
+                    }
+                    if (sb.Length > 0)
+                    {
+                        sb.Remove(sb.Length - 1, 1);
+                    }
+                    sw.Write(sb.AppendLine().ToString());
+                }
+
+                sw.Flush();
+            }
+        }
+
+        private static string Value(object fieldValue)
+        {
+            var ret = string.Empty;
+            if (fieldValue != null)
+            {
+                if (fieldValue is string)
+                {
+                    ret = (string)fieldValue;
+                }
+                else
+                {
+                    ret = fieldValue.ToString();
+                }
+            }
+            return $"\"{ret.Replace("\"", "\\\"")}\"";
         }
 
         /// <summary>
@@ -43,19 +110,19 @@ namespace Bulkins
         /// <param name="sourceFilePath"></param>
         /// <param name="hasHeader"></param>
         /// <returns></returns>
-        private static DataTable ReadCSV(string sourceFilePath, bool hasHeader)
+        private static DataTable ReadCSV(FileInfo fileInfo)
         {
             var dt = new DataTable();
 
-            var parser = new TextFieldParser(sourceFilePath);
-            parser.SetDelimiters(new[] { "," });
+            var parser = new TextFieldParser(fileInfo.Path);
+            parser.SetDelimiters(new[] { fileInfo.Delimiter });
             parser.HasFieldsEnclosedInQuotes = true;
 
             if (!parser.EndOfData)
             {
                 var fields = parser.ReadFields();
 
-                if (hasHeader)
+                if (fileInfo.HasHeader)
                 {
                     for (var i = 0; i < fields.Length; i++)
                     {

@@ -9,15 +9,17 @@ namespace Bulkins
     /// <summary>
     /// Source-file information for Bulkins
     /// </summary>
-    public class SourceFileInfo
+    public class FileInfo
     {
         public string Path { get; set; }
         public bool HasHeader { get; set; }
+        public string Delimiter { get; set; }
 
-        public SourceFileInfo(string path, bool hasHeader = false)
+        public FileInfo(string path, bool hasHeader = true, string delimiter = ",")
         {
             this.Path = path;
             this.HasHeader = hasHeader;
+            this.Delimiter = delimiter;
         }
     }
 }
