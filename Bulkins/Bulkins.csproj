@@ -41,7 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SourceFileInfo.cs" />
+    <Compile Include="FileInfo.cs" />
     <Compile Include="BulkInsertConfiguration.cs" />
     <Compile Include="BulkinsStatic.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
