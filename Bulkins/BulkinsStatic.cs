@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.VisualBasic.FileIO;
+﻿using Microsoft.VisualBasic.FileIO;
 using System.Data;
+using System.Data.SqlClient;
 using System.IO;
+using System.Text;
 
 namespace Bulkins
 {
@@ -57,7 +53,6 @@ namespace Bulkins
                 
                 if (fileInfo.HasHeader)
                 {
-                    var header = new string[c];
                     for (var i = 0; i < c; i++)
                     {
                         sb.Append(Value(dr.GetName(i))).Append(fileInfo.Delimiter);
