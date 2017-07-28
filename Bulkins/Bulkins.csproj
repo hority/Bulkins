@@ -42,7 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileInfo.cs" />
-    <Compile Include="BulkInsertConfiguration.cs" />
+    <Compile Include="BulkInsertOperation.cs" />
     <Compile Include="BulkinsStatic.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
